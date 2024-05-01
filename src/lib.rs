@@ -7,19 +7,18 @@ pub mod game {
     pub const PATH_CHAR: char = '*';
 
     #[derive(Debug)]
-    pub struct Field {
-        pub board: Vec<Vec<char>>,
-        pub index_for_y: usize,
-        pub index_for_x: usize,
-        pub state: bool,
+    struct Game {
+        board: Vec<Vec<char>>,
+        index_for_y: usize,
+        index_for_x: usize,
+        state: bool,
     }
 
-    impl Field {
-        pub fn new(board: Vec<Vec<char>>) -> Self {
-            let (index_for_y, index_for_x) = Field::find_starting_position(&board);
-            println!("Y:{}, X:{}", index_for_y, index_for_y);
+    impl Game {
+        fn new(board: Vec<Vec<char>>) -> Self {
+            let (index_for_y, index_for_x) = Game::find_starting_position(&board);
 
-            Field {
+            Game {
                 board,
                 index_for_y,
                 index_for_x,
@@ -29,8 +28,6 @@ pub mod game {
 
         fn check_state(&mut self) {
             match self.board[self.index_for_y][self.index_for_x] {
-                FIELD_CHAR => {}
-                PATH_CHAR => {}
                 HAT => {
                     self.state = false;
                     println!("You won!");
@@ -40,34 +37,38 @@ pub mod game {
                     println!("You lost!");
                 }
                 _ => {
-                    self.state = false;
-                    println!("You are out of the board!")
+                    println!("Find your hat! Use: W(UP), S(DOWN), D(RIGHT), A(LEFT)\n");
                 }
             }
         }
 
         fn make_move(&mut self, user_input: &str) {
+            print!("\x1B[2J\x1B[1;1H");
             match user_input.to_lowercase().as_str() {
                 "w" => {
                     if self.index_for_y == 0 {
+                        println!("The move is out of the boundaries!\n");
                         return;
                     }
                     self.index_for_y -= 1;
                 }
                 "s" => {
                     if self.index_for_y == (self.board.len() - 1) {
+                        println!("The move is out of the boundaries!\n");
                         return;
                     }
                     self.index_for_y += 1;
                 }
                 "d" => {
                     if self.index_for_x == (self.board[0].len() - 1) {
+                        println!("The move is out of the boundaries!\n");
                         return;
                     }
                     self.index_for_x += 1;
                 }
                 "a" => {
                     if self.index_for_x == 0 {
+                        println!("The move is out of the boundaries!\n");
                         return;
                     }
                     self.index_for_x -= 1;
@@ -82,6 +83,7 @@ pub mod game {
         }
 
         fn print_board(&self) {
+            println!("{:=<1$}", "", self.board[0].len());
             for idx in 0..self.board.len() {
                 let mut part = String::new();
                 for item in &self.board[idx] {
@@ -89,6 +91,7 @@ pub mod game {
                 }
                 println!("{part}");
             }
+            println!("{:=<1$}", "", self.board[0].len());
         }
 
         fn find_starting_position(board: &Vec<Vec<char>>) -> (usize, usize) {
@@ -104,10 +107,9 @@ pub mod game {
     }
 
     pub fn run_game(board: Vec<Vec<char>>) {
-        let mut field = Field::new(board);
+        let mut field = Game::new(board);
+        println!("Find your hat! Use: W(UP), S(DOWN), D(RIGHT), A(LEFT)\n");
         while field.state {
-            print!("\x1B[2J\x1B[1;1H");
-            println!("Find your hat! Use: W(UP), S(DOWN), D(RIGHT), A(LEFT)\n");
             field.print_board();
             let mut input = String::new();
             io::stdin().read_line(&mut input).unwrap();
