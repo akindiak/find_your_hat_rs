@@ -1,5 +1,6 @@
 pub mod game {
     use std::io;
+    use rand::Rng;
 
     pub const HAT: char = '^';
     pub const HOLE: char = 'O';
@@ -119,5 +120,34 @@ pub mod game {
             }
         }
         println!("Thank you for the game!");
+    }
+
+    pub fn generate_board(height: u32, width: u32, percentage: Option<u32>) -> Vec<Vec<char>> {
+        let mut board: Vec<Vec<char>> = Vec::new();
+
+        for _ in 0..height {
+            let mut row: Vec<char> = Vec::new();
+            for _ in 0..width {
+                row.push(FIELD_CHAR)
+            }
+            board.push(row)
+        }
+
+        let percentage = percentage.unwrap_or(40) * height * width / 100;
+        println!("{percentage}");
+        
+        let mut rng = rand::thread_rng(); 
+        for _ in 0..percentage {
+            let h_pos = rng.gen_range(0.0..=1.0) * height as f64;
+            let w_pos = rng.gen_range(0.0..=1.0) * width as f64;
+            board[h_pos as usize][w_pos as usize] = HOLE
+        }
+        
+        let h_pos = rng.gen_range(0.0..=1.0) * height as f64;
+        let w_pos = rng.gen_range(0.0..=1.0) * width as f64;
+        board[h_pos as usize][w_pos as usize] = HAT;
+        board[0][0] = PATH_CHAR;
+
+        board
     }
 }
